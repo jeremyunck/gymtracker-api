@@ -3,7 +3,7 @@ name: Build and Push
 # trigger when terraform apply is successful
 on:
   workflow_run:
-    workflows: ["Terraform Apply"]
+    workflows: ["terraform_apply.yml"]
     branches: ['master']
     types:
       - completed
