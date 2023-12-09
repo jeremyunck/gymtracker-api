@@ -1,43 +1,14 @@
-name: Deploy to ECR
+name: Build and Push
 
+# trigger when terraform apply is successful
 on:
-  push:
-    branches: [ 'master' ]
+  workflow_run:
+    workflows: ["Terraform Apply"]
+    branches: ['master']
+    types:
+      - completed
 
 jobs:
-  terraform-apply:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.0.8
-
-      - name: Configure AWS credentials from GitHub Secrets
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
-
-      - name: Terraform Init
-        working-directory: terraform
-        run: terraform init
-
-      - name: Terraform Plan
-        working-directory: terraform
-        run: terraform plan
-
-      - name: Terraform Apply
-        working-directory: terraform
-        run: terraform apply -auto-approve
-
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
@@ -73,7 +44,7 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: spring-boot-aws-ecr
+          ECR_REPOSITORY: gym_api_repository
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
