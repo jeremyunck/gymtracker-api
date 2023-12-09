@@ -2,11 +2,8 @@ name: Deploy Application
 
 # trigger when terraform apply is successful
 on:
-  workflow_run:
-    workflows: ["Terraform Apply"]
+  push:
     branches: ['master']
-    types:
-      - completed
 
 jobs:
   terraform-apply:
