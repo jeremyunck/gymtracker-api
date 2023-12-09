@@ -5,6 +5,26 @@ on:
     branches: [ 'master' ]
 
 jobs:
+  terraform-apply:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.8
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
