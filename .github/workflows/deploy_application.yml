@@ -84,7 +84,8 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Upload Terraform state file to S3
-        run: aws s3 cp ./terraform/terraform.tfstate s3://${{ secrets.S3_TF_STATE_BUCKET_NAME }}/S3_TFSTATE_KEY
+        run: ls -la
+#        run: aws s3 cp ./terraform/terraform.tfstate s3://${{ secrets.S3_TF_STATE_BUCKET_NAME }}/S3_TFSTATE_KEY
 
 #  build:
 #    needs: upload-tf-state-file
