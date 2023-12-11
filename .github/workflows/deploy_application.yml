@@ -93,46 +93,46 @@ jobs:
           access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-  build:
-    needs: upload-tf-state-file
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Java environment
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-
-      - name: Cache Maven packages
-        uses: actions/cache@v3
-        with:
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          path: ~/.m2
-
-      - name: Build JAR file
-        run: mvn package
-
-      - name: Upload JAR file to AWS S3
-        uses: aws-actions/upload-artifact-to-s3@v2
-        with:
-          aws-region: ${{ secrets.AWS_REGION }}
-          bucket-name: gym-api-app-artifact-bucket
-          path: target/*.jar
-          object-key: gym-api/${{ github.sha }}.jar
-          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Download JAR file from S3
-        uses: actions/download-artifact@v2
-        with:
-          aws-region: ${{ secrets.AWS_REGION }}
-          bucket-name: gym-api-app-artifact-bucket
-          path: target/*.jar
-          object-key: gym-api/${{ github.sha }}.jar
-          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#  build:
+#    needs: upload-tf-state-file
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Set up Java environment
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: '17'
+#
+#      - name: Cache Maven packages
+#        uses: actions/cache@v3
+#        with:
+#          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+#          path: ~/.m2
+#
+#      - name: Build JAR file
+#        run: mvn package
+#
+#      - name: Upload JAR file to AWS S3
+#        uses: aws-actions/upload-artifact-to-s3@v2
+#        with:
+#          aws-region: ${{ secrets.AWS_REGION }}
+#          bucket-name: gym-api-app-artifact-bucket
+#          path: target/*.jar
+#          object-key: gym-api/${{ github.sha }}.jar
+#          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#
+#  deploy:
+#    runs-on: ubuntu-latest
+#    needs: build
+#    steps:
+#      - name: Download JAR file from S3
+#        uses: actions/download-artifact@v2
+#        with:
+#          aws-region: ${{ secrets.AWS_REGION }}
+#          bucket-name: gym-api-app-artifact-bucket
+#          path: target/*.jar
+#          object-key: gym-api/${{ github.sha }}.jar
+#          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
