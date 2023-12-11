@@ -33,7 +33,7 @@ jobs:
           sudo apt-get install -y python3-pip
           sudo pip3 install awscli
 
-      - name: Look for file from S3
+      - name: Download Terraform state file from S3
         run: aws s3 cp s3://${{ secrets.S3_TF_STATE_BUCKET_NAME }}/${{ secrets.S3_TF_STATE_KEY }} ./terraform/terraform.tfstate
 
       - name: Terraform Init
