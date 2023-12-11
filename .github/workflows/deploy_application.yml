@@ -1,9 +1,116 @@
-name: Deploy Application
+#name: Deploy Application
+#
+## trigger when terraform apply is successful
+#on:
+#  push:
+#    branches: ['master']
+#
+#jobs:
+#  terraform-apply:
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: read
+#      packages: write
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Set up Terraform
+#        uses: hashicorp/setup-terraform@v1
+#        with:
+#          terraform_version: 1.0.8
+#
+#      - name: Configure AWS credentials from GitHub Secrets
+#        uses: aws-actions/configure-aws-credentials@v1
+#        with:
+#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          aws-region: us-east-2
+#
+#      - name: Terraform Init
+#        working-directory: terraform
+#        run: terraform init
+#
+#      - name: Terraform Plan
+#        working-directory: terraform
+#        run: terraform plan
+#
+#      - name: Terraform Apply
+#        working-directory: terraform
+#        run: terraform apply -auto-approve
+#
+#  build-and-push:
+#    needs: terraform-apply
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: read
+#      packages: write
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Set up JDK 17
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: '17'
+#          distribution: 'temurin'
+#          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+#          settings-path: ${{ github.workspace }} # location for the settings.xml file
+#
+#      - name: Build with Maven
+#        run: mvn clean package
+#
+#      - name: Configure AWS credentials from GitHub Secrets
+#        uses: aws-actions/configure-aws-credentials@v1
+#        with:
+#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          aws-region: us-east-2
+#
+#      - name: Login to Amazon ECR
+#        id: login-ecr
+#        uses: aws-actions/amazon-ecr-login@v1
+#
+#      - name: Build and push
+#        id: build-image
+#        env:
+#          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#          ECR_REPOSITORY: gym_api_repository
+#          IMAGE_TAG: ${{ github.sha }}
+#        run: |
+#          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+#          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+#          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+#
+#  #  deploy docker ecr image to elastic beanstalk
+#  deploy-to-beanstalk:
+#    needs: build-and-push
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: read
+#      packages: write
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v3
+#
+#      - name: Configure AWS credentials from GitHub Secrets
+#        uses: aws-actions/configure-aws-credentials@v1
+#        with:
+#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          aws-region: us-east-2
+#
+#      - name: Deploy to Elastic Beanstalk
+#        run: |
+#          aws elasticbeanstalk create-application-version --application-name gym_api_application --version-label ${{ github.sha }} --source-bundle S3Bucket=elasticbeanstalk-us-east-2-123456789,S3Key=gym-api/${{ github.sha }}.zip
+#          aws elasticbeanstalk update-environment --environment-name gym_api_dev_environment --version-label ${{ github.sha }}
 
-# trigger when terraform apply is successful
+name: CI/CD for JAR deployment to AWS Elastic Beanstalk
+
 on:
   push:
-    branches: ['master']
+    branches:
+      - master
 
 jobs:
   terraform-apply:
@@ -39,7 +146,7 @@ jobs:
         working-directory: terraform
         run: terraform apply -auto-approve
 
-  build-and-push:
+  upload-tf-state-file:
     needs: terraform-apply
     runs-on: ubuntu-latest
     permissions:
@@ -49,58 +156,74 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up JDK 17
+      - name: Configure AWS credentials from GitHub Secrets
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: Upload Terraform state file to S3
+        uses: actions/upload-artifact@v2
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          bucket-name: "gym-api-tfstate-bucket"
+          path: tfstate/terraform.tfstate
+          object-key: "your-state-file-name.tfstate"
+          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  build:
+    needs: upload-tf-state-file
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Java environment
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: 'temurin'
-          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-          settings-path: ${{ github.workspace }} # location for the settings.xml file
 
-      - name: Build with Maven
-        run: mvn clean package
-
-      - name: Configure AWS credentials from GitHub Secrets
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Cache Maven packages
+        uses: actions/cache@v3
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          path: ~/.m2
+
+      - name: Build JAR file
+        run: mvn package
+
+      - name: Upload JAR file to AWS S3
+        uses: aws-actions/upload-artifact-to-s3@v2
+        with:
           aws-region: us-east-2
+          bucket-name: gym-api-app-artifact-bucket
+          path: target/*.jar
+          object-key: gym-api/${{ github.sha }}.jar
+          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Build and push
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: gym_api_repository
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-
-  #  deploy docker ecr image to elastic beanstalk
-  deploy-to-beanstalk:
-    needs: build-and-push
+  deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+    needs: build
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Configure AWS credentials from GitHub Secrets
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Download JAR file from S3
+        uses: aws-actions/download-artifact-from-s3@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
+          bucket-name: gym-api-app-artifact-bucket
+          path: target/*.jar
+          object-key: gym-api/${{ github.sha }}.jar
+          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Deploy to Elastic Beanstalk
-        run: |
-          aws elasticbeanstalk create-application-version --application-name gym_api_application --version-label ${{ github.sha }} --source-bundle S3Bucket=elasticbeanstalk-us-east-2-123456789,S3Key=gym-api/${{ github.sha }}.zip
-          aws elasticbeanstalk update-environment --environment-name gym_api_dev_environment --version-label ${{ github.sha }}
+      - name: Deploy JAR file to AWS Elastic Beanstalk
+        uses: aws-actions/amazon-elastic-beanstalk-deploy-app-version@v2
+        with:
+          aws-region: us-east-2
+          application-name: gym_api_application
+          environment-name: gym_api_dev_environment
+          version-label: ${{ github.sha }}
+          source-bundle: target/*.jar
+          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
