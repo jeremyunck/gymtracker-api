@@ -22,15 +22,15 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Download Terraform state file from S3
-        uses: actions/download-artifact@v2
-        with:
-          aws-region: ${{ secrets.AWS_REGION }}
-          bucket-name: "gym-api-tfstate-bucket"
-          path: tfstate/terraform.tfstate
-          object-key: "your-state-file-name.tfstate"
-          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          sudo pip3 install awscli
+
+      - name: Download file from S3
+        run: aws s3 cp s3://${{ secrets.S3_TF_STATE_BUCKET_NAME }}/S3_TFSTATE_KEY ./terraform/terraform.tfstate
+
 
   terraform-apply:
     runs-on: ubuntu-latest
@@ -84,14 +84,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Upload Terraform state file to S3
-        uses: actions/upload-artifact@v2
-        with:
-          aws-region: ${{ secrets.AWS_REGION }}
-          bucket-name: "gym-api-tfstate-bucket"
-          path: tfstate/terraform.tfstate
-          object-key: "your-state-file-name.tfstate"
-          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: aws s3 cp ./terraform/terraform.tfstate s3://${{ secrets.S3_TF_STATE_BUCKET_NAME }}/S3_TFSTATE_KEY
 
 #  build:
 #    needs: upload-tf-state-file

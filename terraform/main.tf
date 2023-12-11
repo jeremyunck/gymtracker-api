@@ -6,11 +6,7 @@ provider "aws" {
 #resource "aws_s3_bucket" "gym_api_bucket" {
 #  bucket = "gym-api-app-artifact-bucket"
 #}
-#
-#resource "aws_s3_bucket" "gym_api_tfstate_bucket" {
-#  bucket = "gym-api-tfstate-bucket"
-#}
-#
+
 ## Create IAM role for Beanstalk EC2 instances
 #resource "aws_iam_role" "beanstalk_instance_role" {
 #  name = "aws-gym-api-elasticbeanstalk-ec2-role"
