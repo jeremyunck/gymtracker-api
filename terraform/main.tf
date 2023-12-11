@@ -1,11 +1,11 @@
 provider "aws" {
   region = "us-east-2"
 }
-#
-## Create S3 bucket for application artifacts
-#resource "aws_s3_bucket" "gym_api_bucket" {
-#  bucket = "gym-api-app-artifact-bucket"
-#}
+
+# Create S3 bucket for application artifacts
+resource "aws_s3_bucket" "gym_api_bucket" {
+  bucket = "gym-api-app-artifact-bucket"
+}
 
 ## Create IAM role for Beanstalk EC2 instances
 #resource "aws_iam_role" "beanstalk_instance_role" {
