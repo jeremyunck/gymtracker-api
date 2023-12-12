@@ -7,11 +7,6 @@ resource "aws_s3_bucket" "gym_api_bucket" {
   bucket = "gym-api-app-artifact-bucket"
 }
 
-# Create S3 bucket for application logs
-resource "aws_s3_bucket" "gym_api_app_log_bucket" {
-  bucket = "gym-api-app-log-bucket"
-}
-
 # Create IAM role for Beanstalk EC2 instances
 resource "aws_iam_role" "beanstalk_instance_role" {
   name = "aws-gym-api-elasticbeanstalk-ec2-role"
