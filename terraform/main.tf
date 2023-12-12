@@ -86,6 +86,26 @@ resource "aws_iam_role_policy_attachment" "beanstalk_instance_profile_policy_att
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier"
 }
 
+# Create Security Group for Beanstalk EC2 instances
+resource "aws_security_group" "beanstalk_security_group" {
+  name        = "aws-gym-api-elasticbeanstalk-ec2-sg"
+  description = "Security group for Beanstalk EC2 instances"
+
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Allow traffic from anywhere (adjust based on your needs)
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"] # Allow outbound traffic to anywhere (adjust based on your needs)
+  }
+}
+
 # Create Elastic Beanstalk application
 resource "aws_elastic_beanstalk_application" "gym_api_app" {
   name = "gym-api-app" # Replace with your desired application name
@@ -129,6 +149,12 @@ resource "aws_elastic_beanstalk_environment" "gym_api_app_env" {
     namespace = "aws:elasticbeanstalk:cloudwatch:logs"
     name      = "DeleteOnTerminate"
     value     = "false"
+  }
+
+  setting {
+    name      = "SecurityGroups"
+    namespace = "aws:autoscaling:launchconfiguration"
+    value     = aws_security_group.beanstalk_security_group.name
   }
 }
 
