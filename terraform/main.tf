@@ -7,6 +7,11 @@ resource "aws_s3_bucket" "gym_api_bucket" {
   bucket = "gym-api-app-artifact-bucket"
 }
 
+# Create S3 bucket for application logs
+resource "aws_s3_bucket" "gym_api_app_log_bucket" {
+  bucket = "gym-api-app-log-bucket"
+}
+
 # Create IAM role for Beanstalk EC2 instances
 resource "aws_iam_role" "beanstalk_instance_role" {
   name = "aws-gym-api-elasticbeanstalk-ec2-role"
@@ -51,12 +56,6 @@ resource "aws_iam_role_policy_attachment" "beanstalk_instance_role_policy_attach
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier"
 }
 
-# Create Elastic Beanstalk application
-resource "aws_elastic_beanstalk_application" "gym_api_app" {
-  name = "gym-api-app" # Replace with your desired application name
-  description = "This is my Beanstalk application"
-}
-
 # Create IAM instance profile for Beanstalk EC2 instances
 resource "aws_iam_instance_profile" "beanstalk_instance_profile" {
   name = "aws-gym-api-elasticbeanstalk-ec2-role"
@@ -87,10 +86,10 @@ resource "aws_iam_role_policy_attachment" "beanstalk_instance_profile_policy_att
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier"
 }
 
-# Create log group for the application
-resource "aws_cloudwatch_log_group" "gym_api_app_log_group" {
-  name = "/aws/elasticbeanstalk/gym-api-app"
-  retention_in_days = 7
+# Create Elastic Beanstalk application
+resource "aws_elastic_beanstalk_application" "gym_api_app" {
+  name = "gym-api-app" # Replace with your desired application name
+  description = "This is my Beanstalk application"
 }
 
 # Create Beanstalk environment for the application
@@ -98,11 +97,17 @@ resource "aws_elastic_beanstalk_environment" "gym_api_app_env" {
   name = "gym-api-app-env" # Replace with your desired environment name
   application = aws_elastic_beanstalk_application.gym_api_app.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.1.1 running Corretto 17"
-#  set service role
     setting {
         namespace = "aws:elasticbeanstalk:environment"
         name = "ServiceRole"
         value = aws_iam_role.beanstalk_instance_role.name
+        logging: {
+          application_logs: {
+            s3_bucket_prefix: "gym-api-app-logs"
+          },
+          detailed: true,
+          level: "debug"
+        }
     }
     setting {
         namespace = "aws:autoscaling:launchconfiguration"
