@@ -97,28 +97,39 @@ resource "aws_elastic_beanstalk_environment" "gym_api_app_env" {
   name = "gym-api-app-env" # Replace with your desired environment name
   application = aws_elastic_beanstalk_application.gym_api_app.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.1.1 running Corretto 17"
-    setting {
-        namespace = "aws:elasticbeanstalk:environment"
-        name = "ServiceRole"
-        value = aws_iam_role.beanstalk_instance_role.name
-        logging: {
-          application_logs: {
-            s3_bucket_prefix: "gym-api-app-logs"
-          },
-          detailed: true,
-          level: "debug"
-        }
-    }
-    setting {
-        namespace = "aws:autoscaling:launchconfiguration"
-        name = "IamInstanceProfile"
-        value = aws_iam_role.beanstalk_instance_role.name
-    }
-    setting {
-        namespace = "aws:autoscaling:launchconfiguration"
-        name = "InstanceType"
-        value = "t2.micro"
-    }
+
+  setting {
+      namespace = "aws:elasticbeanstalk:environment"
+      name = "ServiceRole"
+      value = aws_iam_role.beanstalk_instance_role.name
+  }
+  setting {
+      namespace = "aws:autoscaling:launchconfiguration"
+      name = "IamInstanceProfile"
+      value = aws_iam_role.beanstalk_instance_role.name
+  }
+  setting {
+      namespace = "aws:autoscaling:launchconfiguration"
+      name = "InstanceType"
+      value = "t2.micro"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:cloudwatch:logs"
+    name      = "StreamLogs"
+    value     = "true"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:cloudwatch:logs"
+    name      = "RetentionInDays"
+    value     = "7"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:cloudwatch:logs"
+    name      = "DeleteOnTerminate"
+    value     = "false"
+  }
 }
 
 
