@@ -48,6 +48,7 @@ jobs:
       - name: Set up Java environment
         uses: actions/setup-java@v4
         with:
+          distribution: 'corretto'
           java-version: '17'
 
       - name: Cache Maven packages
