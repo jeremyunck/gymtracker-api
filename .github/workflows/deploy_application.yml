@@ -27,14 +27,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Install AWS CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-pip
-          sudo pip3 install awscli
+#      - name: Install AWS CLI
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install -y python3-pip
+#          sudo pip3 install awscli
 
-      - name: Download Terraform state file from S3
-        run: aws s3 cp s3://${{ secrets.S3_TF_STATE_BUCKET_NAME }}/${{ secrets.S3_TF_STATE_KEY }} ./terraform/terraform.tfstate
+#      - name: Download Terraform state file from S3
+#        run: aws s3 cp s3://${{ secrets.S3_TF_STATE_BUCKET_NAME }}/${{ secrets.S3_TF_STATE_KEY }} ./terraform/terraform.tfstate
 
       - name: Terraform Init
         working-directory: terraform
@@ -48,8 +48,8 @@ jobs:
         working-directory: terraform
         run: terraform apply -auto-approve
 
-      - name: Upload Terraform state file to S3
-        run: aws s3 cp ./terraform/terraform.tfstate s3://${{ secrets.S3_TF_STATE_BUCKET_NAME }}/${{ secrets.S3_TF_STATE_KEY }}
+#      - name: Upload Terraform state file to S3
+#        run: aws s3 cp ./terraform/terraform.tfstate s3://${{ secrets.S3_TF_STATE_BUCKET_NAME }}/${{ secrets.S3_TF_STATE_KEY }}
 
 #  build:
 #    needs: upload-tf-state-file
