@@ -126,7 +126,7 @@ resource "aws_elastic_beanstalk_environment" "gym_api_app_env" {
   setting {
       namespace = "aws:autoscaling:launchconfiguration"
       name = "InstanceType"
-      value = "t2.micro"
+      value = "t4g.medium"
   }
   setting {
     namespace = "aws:elasticbeanstalk:cloudwatch:logs"
@@ -150,6 +150,12 @@ resource "aws_elastic_beanstalk_environment" "gym_api_app_env" {
     name      = "SecurityGroups"
     namespace = "aws:autoscaling:launchconfiguration"
     value     = aws_security_group.beanstalk_security_group.name
+  }
+
+  setting {
+    name     = "PORT"
+    namespace = "aws:elasticbeanstalk:application:environment"
+    value    = "8080"
   }
 }
 
