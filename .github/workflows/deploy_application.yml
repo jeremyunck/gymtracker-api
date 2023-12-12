@@ -40,13 +40,13 @@ jobs:
         run: terraform apply -auto-approve
 
   build:
-    needs: upload-tf-state-file
+    needs: terraform-apply
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
       - name: Set up Java environment
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
 
@@ -56,18 +56,27 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           path: ~/.m2
 
+      - name: Maven Test
+        run: mvn clean test
+
       - name: Build JAR file
         run: mvn package
 
-      - name: Upload JAR file to AWS S3
-        uses: aws-actions/upload-artifact-to-s3@v2
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          sudo pip3 install awscli
+
+      - name: Configure AWS credentials from GitHub Secrets
+        uses: aws-actions/configure-aws-credentials@v1
         with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-          bucket-name: gym-api-app-artifact-bucket
-          path: target/*.jar
-          object-key: gym-api/${{ github.sha }}.jar
-          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Upload JAR file to AWS S3
+        run: aws s3 cp target/*.jar s3://gym-api-app-artifact-bucket/gym-api/${{ github.sha }}.jar
 
 #  deploy:
 #    runs-on: ubuntu-latest
