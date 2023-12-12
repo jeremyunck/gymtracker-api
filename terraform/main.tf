@@ -87,6 +87,12 @@ resource "aws_iam_role_policy_attachment" "beanstalk_instance_profile_policy_att
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier"
 }
 
+# Create log group for the application
+resource "aws_cloudwatch_log_group" "gym_api_app_log_group" {
+  name = "/aws/elasticbeanstalk/gym-api-app"
+  retention_in_days = 7
+}
+
 # Create Beanstalk environment for the application
 resource "aws_elastic_beanstalk_environment" "gym_api_app_env" {
   name = "gym-api-app-env" # Replace with your desired environment name
