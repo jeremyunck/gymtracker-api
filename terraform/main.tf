@@ -14,7 +14,6 @@ data "aws_ssm_parameter" "rds_url" {
   name = "/gym-api/rds/url"
 }
 
-
 # Create S3 bucket for application artifacts
 resource "aws_s3_bucket" "gym_api_bucket" {
   bucket = "gym-api-app-artifact-bucket"
@@ -172,7 +171,7 @@ resource "aws_elastic_beanstalk_environment" "gym_api_app_env" {
   }
 
   setting {
-    name      = "JAVA_OPTS"
+    name      = "API_VM_OPTS"
     namespace = "aws:elasticbeanstalk:application:environment"
     value     = "-Drds.username=${data.aws_ssm_parameter.rds_username.value} -Drds.password=${data.aws_ssm_parameter.rds_password.value} -Drds.url=${data.aws_ssm_parameter.rds_url.value}"
   }
