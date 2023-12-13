@@ -52,4 +52,4 @@ jobs:
         run: aws elasticbeanstalk create-application-version --application-name gym-api-app --version-label ${{ github.sha }} --source-bundle S3Bucket=gym-api-app-artifact-bucket,S3Key=gym-api/${{ github.sha }}.jar
 
       - name: Deploy JAR file to AWS Elastic Beanstalk
-        run: aws elasticbeanstalk update-environment --environment-name gym-api-app-dev --version-label ${{ github.sha }}
+        run: aws elasticbeanstalk update-environment --environment-name gym-api-app-env --version-label ${{ github.sha }}
