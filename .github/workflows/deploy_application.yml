@@ -1,7 +1,9 @@
 name: Build Environment and Deploy Application
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - master
 
 jobs:
   build-and-deploy-jar:

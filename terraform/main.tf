@@ -2,6 +2,19 @@ provider "aws" {
   region = "us-east-2"
 }
 
+data "aws_ssm_parameter" "rds_username" {
+  name = "/gym-api/rds/username"
+}
+
+data "aws_ssm_parameter" "rds_password" {
+  name = "/gym-api/rds/password"
+}
+
+data "aws_ssm_parameter" "rds_url" {
+  name = "/gym-api/rds/url"
+}
+
+
 # Create S3 bucket for application artifacts
 resource "aws_s3_bucket" "gym_api_bucket" {
   bucket = "gym-api-app-artifact-bucket"
@@ -9,7 +22,7 @@ resource "aws_s3_bucket" "gym_api_bucket" {
 
 # Create IAM role for Beanstalk EC2 instances
 resource "aws_iam_role" "beanstalk_instance_role" {
-  name = "aws-gym-api-elasticbeanstalk-ec2-role"
+  name               = "aws-gym-api-elasticbeanstalk-ec2-role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -29,25 +42,25 @@ EOF
 
 # Attach AmazonS3FullAccess policy to the role
 resource "aws_iam_role_policy_attachment" "beanstalk_instance_role_policy_attachment" {
-  role = aws_iam_role.beanstalk_instance_role.name
+  role       = aws_iam_role.beanstalk_instance_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
 # Attach AWSElasticBeanstalkWebTier policy to the role
 resource "aws_iam_role_policy_attachment" "beanstalk_instance_role_policy_attachment2" {
-  role = aws_iam_role.beanstalk_instance_role.name
+  role       = aws_iam_role.beanstalk_instance_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier"
 }
 
 # Attach AWSElasticBeanstalkMulticontainerDocker policy to the role
 resource "aws_iam_role_policy_attachment" "beanstalk_instance_role_policy_attachment3" {
-  role = aws_iam_role.beanstalk_instance_role.name
+  role       = aws_iam_role.beanstalk_instance_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkMulticontainerDocker"
 }
 
 # Attach AWSElasticBeanstalkWorkerTier policy to the role
 resource "aws_iam_role_policy_attachment" "beanstalk_instance_role_policy_attachment4" {
-  role = aws_iam_role.beanstalk_instance_role.name
+  role       = aws_iam_role.beanstalk_instance_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier"
 }
 
@@ -59,25 +72,25 @@ resource "aws_iam_instance_profile" "beanstalk_instance_profile" {
 
 # Attach AmazonS3FullAccess policy to the role
 resource "aws_iam_role_policy_attachment" "beanstalk_instance_profile_policy_attachment" {
-  role = aws_iam_instance_profile.beanstalk_instance_profile.name
+  role       = aws_iam_instance_profile.beanstalk_instance_profile.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
 # Attach AWSElasticBeanstalkWebTier policy to the role
 resource "aws_iam_role_policy_attachment" "beanstalk_instance_profile_policy_attachment2" {
-  role = aws_iam_instance_profile.beanstalk_instance_profile.name
+  role       = aws_iam_instance_profile.beanstalk_instance_profile.name
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier"
 }
 
 # Attach AWSElasticBeanstalkMulticontainerDocker policy to the role
 resource "aws_iam_role_policy_attachment" "beanstalk_instance_profile_policy_attachment3" {
-  role = aws_iam_instance_profile.beanstalk_instance_profile.name
+  role       = aws_iam_instance_profile.beanstalk_instance_profile.name
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkMulticontainerDocker"
 }
 
 # Attach AWSElasticBeanstalkWorkerTier policy to the role
 resource "aws_iam_role_policy_attachment" "beanstalk_instance_profile_policy_attachment4" {
-  role = aws_iam_instance_profile.beanstalk_instance_profile.name
+  role       = aws_iam_instance_profile.beanstalk_instance_profile.name
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier"
 }
 
@@ -103,30 +116,30 @@ resource "aws_security_group" "beanstalk_security_group" {
 
 # Create Elastic Beanstalk application
 resource "aws_elastic_beanstalk_application" "gym_api_app" {
-  name = "gym-api-app" # Replace with your desired application name
+  name        = "gym-api-app" # Replace with your desired application name
   description = "This is my Beanstalk application"
 }
 
 # Create Beanstalk environment for the application
 resource "aws_elastic_beanstalk_environment" "gym_api_app_env" {
-  name = "gym-api-app-env" # Replace with your desired environment name
-  application = aws_elastic_beanstalk_application.gym_api_app.name
+  name                = "gym-api-app-env" # Replace with your desired environment name
+  application         = aws_elastic_beanstalk_application.gym_api_app.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.1.1 running Corretto 17"
 
   setting {
-      namespace = "aws:elasticbeanstalk:environment"
-      name = "ServiceRole"
-      value = aws_iam_role.beanstalk_instance_role.name
+    namespace = "aws:elasticbeanstalk:environment"
+    name      = "ServiceRole"
+    value     = aws_iam_role.beanstalk_instance_role.name
   }
   setting {
-      namespace = "aws:autoscaling:launchconfiguration"
-      name = "IamInstanceProfile"
-      value = aws_iam_role.beanstalk_instance_role.name
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "IamInstanceProfile"
+    value     = aws_iam_role.beanstalk_instance_role.name
   }
   setting {
-      namespace = "aws:autoscaling:launchconfiguration"
-      name = "InstanceType"
-      value = "t4g.medium"
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "InstanceType"
+    value     = "t4g.medium"
   }
   setting {
     namespace = "aws:elasticbeanstalk:cloudwatch:logs"
@@ -153,9 +166,15 @@ resource "aws_elastic_beanstalk_environment" "gym_api_app_env" {
   }
 
   setting {
-    name     = "PORT"
+    name      = "PORT"
     namespace = "aws:elasticbeanstalk:application:environment"
-    value    = "8080"
+    value     = "8080"
+  }
+
+  setting {
+    name      = "JAVA_OPTS"
+    namespace = "aws:elasticbeanstalk:application:environment"
+    value     = "-Drds.username=${data.aws_ssm_parameter.rds_username.value} -Drds.password=${data.aws_ssm_parameter.rds_password.value} -Drds.url=${data.aws_ssm_parameter.rds_url.value}"
   }
 }
 
