@@ -171,9 +171,21 @@ resource "aws_elastic_beanstalk_environment" "gym_api_app_env" {
   }
 
   setting {
-    name      = "spring.profiles.active"
+    name      = "DATASOURCE_URL"
     namespace = "aws:elasticbeanstalk:application:environment"
-    value     = "dev"
+    value     = data.aws_ssm_parameter.rds_url.value
+  }
+
+  setting {
+    name      = "DATASOURCE_USERNAME"
+    namespace = "aws:elasticbeanstalk:application:environment"
+    value     = data.aws_ssm_parameter.rds_username.value
+  }
+
+  setting {
+    name      = "DATASOURCE_PASSWORD"
+    namespace = "aws:elasticbeanstalk:application:environment"
+    value     = data.aws_ssm_parameter.rds_password.value
   }
 }
 

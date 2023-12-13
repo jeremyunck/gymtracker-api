@@ -26,12 +26,8 @@ jobs:
       - name: Maven Test
         run: mvn clean test
 
-      - name: Configure AWS credentials from GitHub Secrets
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Build JAR file
+        run: mvn package
 
       - name: Install AWS CLI
         run: |
@@ -39,11 +35,12 @@ jobs:
           sudo apt-get install -y python3-pip
           sudo pip3 install awscli
 
-      - name: Download application-dev.properties from S3
-        run: aws s3 cp s3://gym-api-application-properties/application-dev.properties src/main/resources/application-dev.properties
-
-      - name: Build JAR file
-        run: mvn package
+      - name: Configure AWS credentials from GitHub Secrets
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Upload JAR file to AWS S3
         run: aws s3 cp target/*.jar s3://gym-api-app-artifact-bucket/gym-api/${{ github.sha }}.jar
