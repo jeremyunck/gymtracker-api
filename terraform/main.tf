@@ -169,6 +169,12 @@ resource "aws_elastic_beanstalk_environment" "gym_api_app_env" {
     namespace = "aws:elasticbeanstalk:application:environment"
     value     = "8080"
   }
+
+  setting {
+    name      = "JAVA_OPTS"
+    namespace = "aws:elasticbeanstalk:application:environment"
+    value     = "-Drds.username=${data.aws_ssm_parameter.rds_username.value} -Drds.password=${data.aws_ssm_parameter.rds_password.value} -Drds.url=${data.aws_ssm_parameter.rds_url.value}"
+  }
 }
 
 

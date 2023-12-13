@@ -36,7 +36,7 @@ jobs:
           sudo pip3 install awscli
 
       - name: Configure AWS credentials from GitHub Secrets
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -48,8 +48,7 @@ jobs:
       - name: Deploy JAR file to AWS Elastic Beanstalk
         run: aws elasticbeanstalk create-application-version --application-name gym-api-app \
           --version-label ${{ github.sha }} \
-          --source-bundle S3Bucket=gym-api-app-artifact-bucket,S3Key=gym-api/${{ github.sha }}.jar \
-          --environment_variables API_VM_OPTS="-Drds.username=test -Drds.password=test -Drds.url=//gymtracker-dev.crvq5paxn8dg.us-east-2.rds.amazonaws.com\:3306/gymtrackerdb"
+          --source-bundle S3Bucket=gym-api-app-artifact-bucket,S3Key=gym-api/${{ github.sha }}.jar
 
       - name: Deploy JAR file to AWS Elastic Beanstalk
         run: aws elasticbeanstalk update-environment --environment-name gym-api-app-dev \
