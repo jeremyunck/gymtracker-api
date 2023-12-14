@@ -1,6 +1,7 @@
 package org.example.service;
 
 import org.example.controller.ExerciseManagerController.request.CreateExerciseRequest;
+import org.example.controller.ExerciseManagerController.response.GetExerciseResponse;
 import org.example.exception.ExerciseFailedToCreateException;
 import org.example.exception.ExerciseInvalidRequest;
 import org.example.model.Exercise;
@@ -40,6 +41,18 @@ public class ExerciseManagerService {
         if (exerciseManagerRepository.findById(exercise.getId()).isEmpty()) {
             throw new ExerciseFailedToCreateException("Failed to create exercise");
         }
+    }
+
+public GetExerciseResponse getExercise(long id) {
+        Exercise exercise = exerciseManagerRepository.findById(id).orElseThrow(() -> new ExerciseInvalidRequest("Exercise not found"));
+        return GetExerciseResponse.builder()
+                .id(String.valueOf(exercise.getId()))
+                .name(exercise.getName())
+                .description(exercise.getDescription())
+                .createdBy(exercise.getCreatedBy())
+                .createdAt(exercise.getCreatedAt().toString())
+                .usedCount(exercise.getUsedCount())
+                .build();
     }
 
 }
