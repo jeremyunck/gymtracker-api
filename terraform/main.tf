@@ -141,11 +141,6 @@ resource "aws_elastic_beanstalk_environment" "gym_api_app_env" {
     value     = "t4g.micro"
   }
   setting {
-    namespace = "aws:autoscaling:launchconfiguration"
-    value     = "SingleInstance"
-    name      = "DeploymentPolicy"
-  }
-  setting {
     namespace = "aws:elasticbeanstalk:cloudwatch:logs"
     name      = "StreamLogs"
     value     = "true"
