@@ -1,11 +1,11 @@
 package org.example.service;
 
-import org.example.controller.ExerciseManagerController.request.CreateExerciseRequest;
-import org.example.controller.ExerciseManagerController.response.GetExerciseResponse;
+import org.example.controller.exercisemanagercontroller.request.CreateExerciseRequest;
+import org.example.controller.exercisemanagercontroller.response.GetExerciseResponse;
 import org.example.exception.ExerciseFailedToCreateException;
 import org.example.exception.ExerciseInvalidRequest;
-import org.example.model.Exercise;
-import org.example.repository.ExerciseManagerRepository;
+import org.example.jpa.Exercise;
+import org.example.repository.ExerciseRepository;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import java.sql.Timestamp;
 @Service
 public class ExerciseManagerService {
     @Autowired
-    private ExerciseManagerRepository exerciseManagerRepository;
+    private ExerciseRepository exerciseRepository;
 
     public void createExercise(CreateExerciseRequest createExerciseRequest) {
         if (createExerciseRequest.getName() == null || createExerciseRequest.getName().isEmpty()) {
@@ -32,19 +32,19 @@ public class ExerciseManagerService {
                 .name(createExerciseRequest.getName())
                 .description(createExerciseRequest.getDescription())
                 .createdBy(createExerciseRequest.getCreatedBy())
-                .createdAt(new Timestamp(DateTime.now().getMillis()))
+                .createdAt(Timestamp.valueOf(DateTime.now().toString()))
                 .usedCount(0)
                 .build();
 
-        exerciseManagerRepository.save(exercise);
+        exerciseRepository.save(exercise);
 
-        if (exerciseManagerRepository.findById(exercise.getId()).isEmpty()) {
+        if (exerciseRepository.findById(exercise.getId()).isEmpty()) {
             throw new ExerciseFailedToCreateException("Failed to create exercise");
         }
     }
 
 public GetExerciseResponse getExercise(long id) {
-        Exercise exercise = exerciseManagerRepository.findById(id).orElseThrow(() -> new ExerciseInvalidRequest("Exercise not found"));
+        Exercise exercise = exerciseRepository.findById(id).orElseThrow(() -> new ExerciseInvalidRequest("Exercise not found"));
         return GetExerciseResponse.builder()
                 .id(String.valueOf(exercise.getId()))
                 .name(exercise.getName())

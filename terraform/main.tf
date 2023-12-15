@@ -138,7 +138,7 @@ resource "aws_elastic_beanstalk_environment" "gym_api_app_env" {
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "InstanceType"
-    value     = "t4g.micro"
+    value     = "t2.micro"
   }
   setting {
     namespace = "aws:elasticbeanstalk:cloudwatch:logs"

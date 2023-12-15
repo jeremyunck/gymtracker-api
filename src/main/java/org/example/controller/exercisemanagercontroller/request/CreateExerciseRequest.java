@@ -1,4 +1,4 @@
-package org.example.controller.ExerciseManagerController.request;
+package org.example.controller.exercisemanagercontroller.request;
 
 import lombok.Data;
 

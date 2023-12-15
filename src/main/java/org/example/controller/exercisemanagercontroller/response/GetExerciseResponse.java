@@ -1,4 +1,4 @@
-package org.example.controller.ExerciseManagerController.response;
+package org.example.controller.exercisemanagercontroller.response;
 
 import lombok.Builder;
 import lombok.Data;

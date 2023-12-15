@@ -1,7 +1,7 @@
-package org.example.controller.ExerciseManagerController;
+package org.example.controller.exercisemanagercontroller;
 
-import org.example.controller.ExerciseManagerController.request.CreateExerciseRequest;
-import org.example.controller.ExerciseManagerController.response.GetExerciseResponse;
+import org.example.controller.exercisemanagercontroller.request.CreateExerciseRequest;
+import org.example.controller.exercisemanagercontroller.response.GetExerciseResponse;
 import org.example.service.ExerciseManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
