@@ -6,6 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.util.Constants;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.sql.Timestamp;
 
 @Data
 @Entity
@@ -17,12 +21,18 @@ import lombok.NoArgsConstructor;
 public class WorkoutLogEntry {
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
+    @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
     private long id;
+
     @JoinColumn(name = "user_id")
     @ManyToOne
     private User user;
+
     @JoinColumn(name = "routine_id")
     @ManyToOne
     private Routine routine;
+
+    @Column(name = "created_at")
+    @DateTimeFormat(pattern = Constants.TIMESTAMP_FORMAT)
+    private Timestamp createdAt;
 }

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.util.Constants;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.sql.Timestamp;
@@ -19,7 +20,7 @@ import java.sql.Timestamp;
 @Schema(description = "All details about the User.")
 public class User {
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.UUID)
+    @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
     private long id;
 
     @Column(name="name")
@@ -29,6 +30,6 @@ public class User {
     private String email;
 
     @Column(name="created_at")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = Constants.TIMESTAMP_FORMAT)
     private Timestamp createdAt;
 }

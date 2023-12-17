@@ -6,5 +6,5 @@ import lombok.Data;
 public class CreateExerciseRequest {
     private String name;
     private String description;
-    private String createdBy;
+    private long creatorId;
 }

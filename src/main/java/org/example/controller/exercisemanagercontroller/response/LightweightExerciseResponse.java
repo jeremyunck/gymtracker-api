@@ -2,14 +2,11 @@ package org.example.controller.exercisemanagercontroller.response;
 
 import lombok.Builder;
 import lombok.Data;
+import org.example.jpa.ExerciseView;
 
 @Data
 @Builder
-public class GetExerciseResponse {
+public class LightweightExerciseResponse {
     private String id;
     private String name;
-    private String description;
-    private String createdBy;
-    private String createdAt;
-    private int usedCount;
 }

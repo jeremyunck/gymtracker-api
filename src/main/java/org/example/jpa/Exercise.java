@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.util.Constants;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.sql.Timestamp;
@@ -20,17 +21,23 @@ import java.sql.Timestamp;
 public class Exercise {
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
     @Column(name="name")
     private String name;
+
     @Column(name="description")
     private String description;
-    @Column(name="created_by")
-    private String createdBy;
+
+    @JoinColumn(name="creator_id")
+    @ManyToOne
+    private User creator;
+
     @Column(name="created_at")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = Constants.TIMESTAMP_FORMAT)
     private Timestamp createdAt;
+
     @Column(name="used_count")
     private int usedCount;
 }

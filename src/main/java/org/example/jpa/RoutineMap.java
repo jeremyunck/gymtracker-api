@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.util.Constants;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.sql.Timestamp;
@@ -20,7 +21,7 @@ import java.sql.Timestamp;
 public class RoutineMap {
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.UUID)
+    @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
     private long id;
 
     @JoinColumn(name = "routine_id")
@@ -35,6 +36,6 @@ public class RoutineMap {
     private int orderNumber;
 
     @Column(name = "created_at")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = Constants.TIMESTAMP_FORMAT)
     private Timestamp createdAt;
 }
