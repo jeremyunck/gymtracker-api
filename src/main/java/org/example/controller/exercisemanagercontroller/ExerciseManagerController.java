@@ -41,4 +41,10 @@ public class ExerciseManagerController {
         log.info("Received request to search exercises by name: " + name);
         return ResponseEntity.ok(exerciseManagerService.searchExerciseByName(name));
     }
+
+    @DeleteMapping("/deleteExercise/{id}")
+    public void deleteExercise(@PathVariable("id") long id) {
+        log.info("Received request to delete exercise with id: " + id);
+        exerciseManagerService.deleteExercise(id);
+    }
 }

@@ -6,5 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class GetExerciseByIdResponse {
-    LightweightExerciseResponse exercise;
+    private String id;
+    private String name;
+    private String description;
 }

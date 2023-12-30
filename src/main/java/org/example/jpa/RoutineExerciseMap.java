@@ -16,9 +16,9 @@ import java.sql.Timestamp;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "routine_map")
+@Table(name = "routine_exercise_map")
 @Schema(description = "Maps exercises to routines. Order number is the order in which the exercises should be performed.")
-public class RoutineMap {
+public class RoutineExerciseMap {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
@@ -26,11 +26,11 @@ public class RoutineMap {
 
     @JoinColumn(name = "routine_id")
     @OneToOne
-    private Routine routineId;
+    private Routine routine;
 
     @JoinColumn(name = "exercise_id")
     @OneToOne
-    private Exercise exerciseId;
+    private Exercise exercise;
 
     @Column(name = "order_number")
     private int orderNumber;

@@ -4,9 +4,10 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 @Data
 @Builder
 public class GetAllExercisesResponse {
-    ArrayList<LightweightExerciseResponse> exercises;
+    private HashMap<String, String> exercises;
 }

@@ -1,7 +1,8 @@
 package org.example.jpa;
 
 public interface ExerciseView {
-    int getId();
+    long getId();
+    String getDescription();
     String getName();
 
 }
