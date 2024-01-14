@@ -14,4 +14,4 @@ and the database it connects to is hosted on AWS RDS.
 5. Run the application
 
 The project uses JPA to set up the tables for you. The API should now be running on `localhost:8080`. 
-You can test it through the swagger UI at http://localhost:8080/swagger-ui/index.html#/.
+You can test it through the swagger UI at http://localhost:8080/api/v1/swagger-ui/index.html#/.

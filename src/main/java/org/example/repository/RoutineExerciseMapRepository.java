@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface RoutineExerciseMapRepository extends JpaRepository<RoutineExerciseMap, Long> {
     List<ExerciseByRoutineIdView> findExerciseByRoutineId(Long routineId);
+    List<RoutineExerciseMap> findByRoutineId(Long routineId);
 }

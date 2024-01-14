@@ -7,6 +7,7 @@ import org.example.controller.routinemanagercontroller.response.GetFullRoutineBy
 import org.example.exception.InvalidRequestException;
 import org.example.jpa.Exercise;
 import org.example.jpa.Routine;
+import org.example.jpa.RoutineExerciseMap;
 import org.example.jpa.User;
 import org.example.repository.ExerciseRepository;
 import org.example.repository.RoutineExerciseMapRepository;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class RoutineManagerService {
@@ -75,8 +77,11 @@ public class RoutineManagerService {
                 .build();
     }
 
+    @Transactional
     public void deleteRoutine(long id) {
         Routine routine = routineRepository.findById(id).orElseThrow(() -> new InvalidRequestException("Routine not found"));
+        List<RoutineExerciseMap> routineExerciseMaps = routineExerciseMapRepository.findByRoutineId(id);
+        routineExerciseMaps.forEach(routineExerciseMap -> routineExerciseMapRepository.delete(routineExerciseMap));
         routineRepository.delete(routine);
     }
 }

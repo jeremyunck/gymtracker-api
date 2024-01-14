@@ -24,8 +24,8 @@ public class ExerciseManagerController {
         exerciseManagerService.createExercise(createExerciseRequest);
     }
 
-    @GetMapping("/getExercise/{id}")
-    public ResponseEntity<GetExerciseByIdResponse> getExercise(@PathVariable("id") long id) {
+    @GetMapping("/getExerciseById/{id}")
+    public ResponseEntity<GetExerciseByIdResponse> getExerciseById(@PathVariable("id") long id) {
         log.info("Received request to get exercise with id: " + id);
         return ResponseEntity.ok(exerciseManagerService.getExerciseById(id));
     }
